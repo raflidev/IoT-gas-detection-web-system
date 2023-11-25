@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import axios from 'axios';
 
 const clientId = 'mqttjs_' + Math.random().toString(16).substr(2, 8)
-const host = 'ws://broker.mqttdashboard.com:8000/mqtt'
+const host = 'wss://broker.mqttdashboard.com:8000/mqtt'
 
 const options = {
   keepalive: 60,
