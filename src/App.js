@@ -1,5 +1,6 @@
 import mqtt from 'mqtt';
 import { useEffect, useState } from 'react';
+import axios from 'axios';
 
 const clientId = 'mqttjs_' + Math.random().toString(16).substr(2, 8)
 const host = 'ws://broker.mqttdashboard.com:8000/mqtt'
@@ -24,6 +25,7 @@ const client = mqtt.connect(host, options)
 function App() {
   const [mq7, setMq7] = useState(0);
   const [mq135, setMq135] = useState(0);
+  const [result, setResult] = useState(null);
 
     
   client.on('message', (topic, message, packet) => {
@@ -44,6 +46,18 @@ function App() {
       client.subscribe('rafli/mq7135/gas/mq135', { qos: 0 })
     })
   }, [])
+
+  const prediction = (e) => {
+    e.preventDefault();
+    axios.post('https://gas-detection.onrender.com/predict', {
+      mq7: mq7,
+      mq135: mq135
+    }).then((res) => {
+      setResult(res.data.hasil);
+    }).catch((err) => {
+      console.log(err);
+    })
+  }
   
   return (
     <div className="bg-gray-400 w-screen h-screen">
@@ -91,8 +105,18 @@ function App() {
             </div>
           </div>
 
-          <div class="mx-auto sm:w-3/4 md:w-2/4 fixed inset-x-0 bottom-10 px-10">
-            <button class="bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 my-4 rounded-md text-center text-lg flex justify-center items-center w-full">
+          {
+            result &&
+            <div className='text-center bg-gray-300 py-4 mx-4 rounded'>
+              <div className='text-lg'>Result</div>
+              <div className='text-xl font-bold'>
+                {result}
+              </div>
+            </div>
+          }
+
+          <div className="mx-auto sm:w-3/4 md:w-2/4 fixed inset-x-0 bottom-10 px-10">
+            <button onClick={prediction} className="bg-gray-700 hover:bg-gray-600 text-white px-6 py-4 my-4 rounded-md text-center text-lg flex justify-center items-center w-full">
               Predict
             </button>
         </div>
